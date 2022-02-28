@@ -1,5 +1,34 @@
 // Storage controller
 
+const StorageCtrl = (function () {
+    return {
+        storeItem: function (item) {
+            let items ;
+
+            if(localStorage.getItem('items') === null){
+                items = [];
+                items.push(item)
+                localStorage.setItem('items' , JSON.stringify(items))
+            }else{
+                items = JSON.parse(localStorage.getItem('items'))
+                items.push(item)
+                localStorage.setItem('items' , JSON.stringify(items))
+            }
+        },
+
+        getItemsFromStorage : function () {
+            let items ;
+            if(localStorage.getItem('items') === null) {
+                items = []
+            }else{
+                items = JSON.parse(localStorage.getItem('items'))
+
+            }
+            return items;
+        }
+    }
+})()
+
 // Item controller
 const ItemCtrl = (function () {
   const Item = function (id, name, calories) {
@@ -9,11 +38,12 @@ const ItemCtrl = (function () {
   };
 
   const data = {
-    items: [
-      //   { id: 0, name: 'Steak Dinner', calories: 1200 },
-      //   { id: 1, name: 'Cookie', calories: 400 },
-      //   { id: 2, name: 'Eggs', calories: 300 },
-    ],
+    // items: [
+    //   //   { id: 0, name: 'Steak Dinner', calories: 1200 },
+    //   //   { id: 1, name: 'Cookie', calories: 400 },
+    //   //   { id: 2, name: 'Eggs', calories: 300 },
+    // ],
+    items: StorageCtrl.getItemsFromStorage(),
     currentItem: null,
     totalCalories: 0,
   };
@@ -238,7 +268,7 @@ const UICtrl = (function () {
 
 // App controller
 
-const App = (function (ItemCtrl, UICtrl) {
+const App = (function (ItemCtrl, StorageCtrl ,  UICtrl) {
   const loadEvent = function () {
     const UISelectors = UICtrl.getSelectors();
 
@@ -287,6 +317,8 @@ const App = (function (ItemCtrl, UICtrl) {
       const totalCalories = ItemCtrl.getTotalCalories();
 
       UICtrl.showTotalCalories(totalCalories);
+
+      StorageCtrl.storeItem(newItem)
 
       UICtrl.clearInput();
     }
@@ -350,7 +382,7 @@ const App = (function (ItemCtrl, UICtrl) {
     UICtrl.showTotalCalories(totalCalories);
 
     UICtrl.removeItems()
-    
+
   };
 
 
@@ -373,6 +405,6 @@ const App = (function (ItemCtrl, UICtrl) {
       loadEvent();
     },
   };
-})(ItemCtrl, UICtrl);
+})(ItemCtrl,StorageCtrl, UICtrl);
 
 App.init();
